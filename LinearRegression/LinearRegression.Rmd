@@ -1,0 +1,467 @@
+---
+title: "Linear Regression"
+author: Dr. Saad
+output: 
+  beamer_presentation: 
+    colortheme: beaver
+    fonttheme: professionalfonts
+    theme: Warsaw
+    highlight: espresso
+    slide_level: 2
+    fig_width: 5
+    fig_height: 2
+fontsize: 9pt
+#classoption: aspectratio=1610
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE)
+options(digits = 4)
+```
+## Outline
+
+  > 1. General Concepts
+  > 2. Simple linear Regression
+  > 3. Methodology of analysis
+  > 4. lm() function
+  > 5. Verbs from dplyr package
+  > 6. Fitting Simple Linear Regression: Example
+  > 7. Introduction to **broom** package
+  > 8. Wrap up Examples
+  > 9. Final Project
+
+# Theoritical Part
+## Necessary Tools for This Lecture 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, include=TRUE}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(broom)
+```
+
+## Terminology
+
+  >- **Dependent variable** (a.k.a. Response, or Target variable): is the variable we want to predict. In **linear Regression** it must be **continuous** (numeric)
+
+  >- **Independent Variable(s)** (a.k.a **Explanatory**, **Input** variable): The variables that explain how the dependent variable will change.
+
+## Types of variable
+
+  1. **Numeric** or **Quantitative** Variable: which can be 
+      1. Continuous: eg. prices, income ...etc
+      2. Discrete: count variable, eg. number of wins
+      
+  2. **Qualitative** or **Categorical** variable: which can be
+      1. Ordinal: eg. Level of education,Regions ... etc. 
+      
+## Scenarios to be in Mind when Modelling
+  
+  Determining the type of model depends on the type of variables
+
+### Case 01: **Dependent is continuous**
+
+  **Independent variable(s)**
+  
+  > 1. Continous:
+  
+  >- Linear Regression (OLS)
+  
+  > 2. Categorical
+  
+  >- ANOVA (Analysis of variance)
+  
+  > 3. Both (Continuous and Categorical)
+  
+  >- ANCOVA (Analysis of covariance)
+
+---
+
+### Case 02:**Dependent is Categorical**
+      
+**Independent variable(s)**
+  
+  > 1. Continous:
+  
+  >- Logistic Regression or (classification)
+  
+  > 2. Categorical
+  
+  >- Logistic Regression or (classification)
+  
+  > 3. Both (Continuous and Categorical)
+  
+  >- Logistic Regression or (classification)
+
+
+## General Formula of a simple linear regression
+ 
+
+The general formula of a simple linear regression 
+$$\mathbf{Dep = \beta_{0} + \beta_{1} indep + \varepsilon}$$
+or in mathematical notations 
+
+$$\mathbf{Y = \beta_{0}+ \beta_{1}X + \varepsilon}$$
+Or literally: 
+$$\mathbf{Y = intercept+ Slope* X + noise}$$
+
+## Methodology of Analysis
+
+The first step is called EDA (**Exploratory Data Analysis**). 
+
+  > 1. Data Exploration: data structure, variables names, number of rows and coloumns. 
+  
+  > 2. Draw graphs
+  
+  > 3. Summary statistics
+  
+  > 4. Preprocess the data if necessary: scaling, centering, normalizing, dealing with missing data ...etc
+  
+  > 5. Building the model (Fitting linear regression)
+  
+  > 6. Report the results
+  
+## Start Point of a Project
+
+Before we start doing any analysis, we must start with a question in mind, or a problem to solve.
+
+The second step is to collect some data to answer this question. 
+
+Based on the question(s), we will determine the response variable, and the dependent variables. 
+
+## Estimation of simple linear Regression
+
+the function used to estimate the linear regression is the `lm()` function. 
+
+as always, use the `help(lm)` if you are not familiar with the function. 
+```{r, include=TRUE, echo=TRUE}
+help(lm)
+```
+
+get the arguments 
+
+```{r, echo=TRUE, include=TRUE}
+args(lm)
+```
+
+## The formula function
+
+The first argument of `lm` function is another function called formula. We must get familiar with this function
+
+`formula()` is used to represent a mathematical equation in R, in our case the model. 
+
+To represent the equal sign $=$ in R, we will use a sign called **tilde** `~`. This sign separates the **response variable** from the **explanatory variables**
+
+for example $$y= a + b$$ 
+can be represented in R by using `formula()` function as.
+```{r echo=TRUE, include=TRUE}
+formula(y~a + b)
+```
+
+---
+
+## Checking the formula object
+
+```{r echo=TRUE, include=TRUE}
+fml <- formula(y~a+b)
+fml
+class(fml)
+typeof(fml)
+mode(fml)
+```
+
+## Simple Linear Regression Formula in R
+
+As for a simple linear regression model, the formula simply can be written as 
+
+```{r echo=TRUE, include=TRUE}
+model_formula <- as.formula(y~x)
+model_formula
+```
+**Note**: The automatically includes an intercept in the model. So there is no need to add one.
+
+## General Formula
+
+the simple linear regression formula can extend to be a multiple formula by using the plus **+** sign between predictors. It is done in R like this:
+
+```{r echo=TRUE, include=TRUE}
+as.formula(y ~ x_1 + x_2 + ... + x_k)
+```
+## The Data Argument
+
+The second argument to be passed to `lm()` function is **data**, which is the data set that contains the variables to be estimated in the model. data can be a `data.frame`. 
+
+the general formula for a model will be 
+
+```{r echo =TRUE, eval=FALSE, include=TRUE}
+#model <- lm(dep ~ indep, data='dataset-name')
+```
+
+    -- See the help for other arguments `help(lm)`. 
+
+
+## A visit to dplyr package
+
+`dplyr` package is called the **The Grammar of Data manipulation**. In this short visit we are going to call few functions
+
+  1. `glimpse` function: It works just like `str` but it gives a nice printing of the data structure
+  2. `select` select the variables of interest from a data set.
+
+Another important and widely used operator is the **pipe operator** `%>%` from `magrittr` package -imported by dplyr-. This operator simplifies the code a great deal. 
+
+## Understanding The Pipe %>% 
+
+To write the pipe use the shortcut `ctrl + Shift + m` 
+
+**Simply, the operator passes the last result to the first argument of the next function**
+
+Examples
+
+```{r}
+16 %>% log() # the same as 
+log(16)
+81 %>% sqrt() %>% log() # The same as 
+log(sqrt(81))
+```
+What do you prefer?
+
+---
+
+The pipe is used extensively in data manipulation. Here an example with `select` function
+
+```{r echo=TRUE, include=TRUE}
+# data(mtcars)
+# names(mtcars)
+mtcars %>% select(mpg, wt) %>% head(2)
+# the same as 
+select(mtcars, mpg, wt) %>% head(2)
+```
+
+# Practice Part
+
+1. Loading a dataset 
+
+```{r echo=TRUE, include=TRUE}
+df <- MASS::Cars93
+colnames(df)
+```
+
+---
+
+2. Data Exploration
+
+The most comonly used functions in data exploration are listed  below 
+
+```{r echo=TRUE, include=TRUE}
+#str() or glimpse()
+#head(df)
+#tail(df)
+#names() or colnames()
+#nrow()
+#ncol()
+#summary()
+```
+
+---
+
+3. Selecting the variables of interest
+  
+  To make things simple, we start by fitting simple linear regression. The we will tackle more complicated models. 
+  
+We will use the `select` function to choose only two variables. The reason we use this function for its simplicity. 
+
+```{r}
+my_df <- df %>% select(Weight, MPG.highway)
+my_df %>% head(3)
+```
+
+---
+
+  4. Summary Statistics 
+
+```{r}
+summary(my_df)
+```
+
+---
+
+  5. Plotting 
+```{r}
+my_df %>% ggplot(aes(Weight, MPG.highway)) +
+  geom_point(color = "blue", alpha = 0.5)
+```
+
+## Adding a fitted line to the plot 
+
+```{r}
+my_df %>% ggplot(aes(Weight, MPG.highway)) +
+  geom_point(color = "blue", alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+
+## Fit Simple Linear Regression 
+
+```{r}
+model <- lm(MPG.highway~Weight , data = my_df)
+model
+```
+## Ckecking `lm()` Objects
+
+It is extremely important to know how objects are stored in R. This will help you a great deal when you deal with complex models. 
+
+```{r}
+class(model)
+typeof(model)
+length(model)
+```
+
+---
+
+```{r}
+names(model)
+# Use str() for more details about lm object
+# str(model)
+```
+
+
+
+## Extracting Information From lm object
+
+ - **`summary()`** The very first function would anyone know about, It gives the summary results of the fitted model.
+ - **`coefficients()`** Reports the estimated parameters 
+ - **`residuals()`** gives the residuals or **errors**
+ - **`fitted()`** provides the fitted values **y_hat**
+ - **`predict()`** used for predictions
+ - **`plot()`** For diagnostic plots
+
+### Other functions 
+  - `confint()` for confidence interval
+  - `anova()` for analysis of variance or comparing models.
+  - `vcov()` for variance covariance matrix. 
+  - `AIC()` For Akaike's Information Criterion. 
+
+---
+
+### Summary Function
+```{r}
+summary(model)
+```
+
+---
+
+### Coefficients Function
+```{r}
+coefficients(model)
+```
+
+---
+
+### Fitted function
+```{r}
+head(fitted(model), 5)
+```
+
+---
+
+### Residuals Function
+```{r}
+head(residuals(model), 5)
+```
+
+---
+
+### anova function
+```{r}
+anova(model)
+```
+
+---
+
+## Diagnostic plots 
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 1)
+```
+
+---
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 2)
+```
+
+---
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 3)
+```
+
+---
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 4)
+```
+
+---
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 5)
+```
+
+---
+
+```{r fig.height=3.5, fig.width=7}
+plot(model, which = 6)
+```
+
+---
+
+### predict function
+
+```{r}
+head(predict(model, my_df), 10)
+```
+
+#### *Note:* 
+  **predict** function Will be discussed later in the course in a great detail
+
+
+# Introduction to **broom** Package
+
+## Overview of Broom functions
+
+We have seen that the summary function returns lots of information, which is designed to be read not to be manipulated with code. However, we certainly need that information to be used in our code, such as plots. Only functions that return data in some data type like vectors or data frames can be used inside the `R` code.
+
+**Broom** Package provides three convenient function: `tidy()`, `augment()` and `glance()`. These functions return information in form of `data.frame` which makes it easier to include in `tidyverse` package function. **We will focus on this package along our course**
+
+Each of these function will be discussed individually in the next slides.  
+
+## Tidy() function
+
+  Generally, `tidy()` function  returns the estimated coefficients and their details in a data.frame. Consider that `tidy()` deals with **The first part of summary() function output**
+
+```{r}
+head(tidy(model))
+```
+
+
+## Augment() Function
+  This function deals with observation specifications that are used in the model estimation and more useful information. 
+
+```{r}
+names(augment(model))
+head(augment(model), 3)
+```
+
+
+## Glance() Function
+
+  It returns model-level results, the model specifications. You can think of it as it returns the last part of `summary` function output. 
+  
+```{r}
+names(glance(model))
+head(glance(model))
+```
+
+
+
