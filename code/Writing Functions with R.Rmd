@@ -1,0 +1,777 @@
+---
+title: "Writing Functions with R"
+author: Dr. Saad Laouadi
+output: 
+  beamer_presentation: 
+    colortheme: beaver
+    fonttheme: professionalfonts
+    theme: Warsaw
+    highlight: tango
+fontsize: "10pt"
+classoption: aspectratio=1610
+---
+## The Table of Contents
+
+  > 1. Motivation 
+  > 2. Writing Functions
+        * without arguments
+        * With arguments
+        * Default arguments 
+        * the Return of functions
+  > 3. final Project: Writing a simulation function
+
+## Different Types of Programming 
+
+### Functional Programming:
+  It is also called **Procedural Programming**, which is way write well-structured (modular) code. 
+  Everything you do, like calculations, is built on functions.
+  Functions let you reuse the same computational building block in different parts of a program or script.
+
+### Spaghetti Code: 
+  Writing one line after another, a command after another, without a clear structure. This kind of code is hard to read, hard to debug and understand. Preferably avoid this kind of programming. 
+  
+### Object Oriented Programming **OOP**
+  More General concept of writing codes in programming languages. R is an OOP programming Language, which makes it very powerful programming language. 
+
+
+
+## Motives for Writing Functions:
+
+Why would I ever want to write functions in R while I can use others' functions?
+
+I can answer this question by giving some reasons:
+
+### Shift from being an R user to an R developer
+
+  > I do not want to be a developer, I am just a user.
+
+### Use and Understand others' functions effectively.
+
+  > * Understand the mechanism of how functions perform to 
+    to use them efficiently.
+  > * What arguments the functions have
+  > * How to pass thes arguments
+  > * Understand the function's documentation
+  > * If something goes wrong, you can solve the problem
+
+------------------------------------------------------------------------
+
+## When consider to write functions
+
+1.  Whenever you find yourself copying and pasting, there is a good chance to write a function
+2.  Sharing your code with others
+3.  writing functions make the code less error prone.
+4.  Uphold the programming principle **DRY**. **Don't Repeat Yourself**
+
+## Your First Functions
+
+There are countless written functions out there by the **R** community.
+We write our first own function:
+
+```{r}
+hello <- function(){
+  print("Hello R programmers!")
+}
+hello()        # Here we call the hello() functions
+```
+
+## Some R base Functions
+
+```{r}
+# mean()
+# sort()
+# print()
+# ls()
+# data()
+# str()
+```
+
+## Functions Definition
+
+### The General Function Template
+
+```{r}
+my_func <- function(arg1, arg2){
+  # Do some calculations
+}
+```
+
+## The Anatomy of Functions
+
+> -   You give a name to the function: here is my_func
+> -   use the assignment operator '\<-'
+> -   Use the keyword 'function'
+> -   Pass some arguments to the function if there are any between parentheses
+> -   function(arg1, arg2) ==\> This is called the function signature
+> -   open curly braces {}
+> -   Inside the curly braces is the body of the function
+
+------------------------------------------------------------------------
+
+### Remark
+
+> -   Variables are objects, so they are nouns
+> -   functions perform some actions, thus they are verbs so preferably name your functions as "verbs" or has a verb in the name
+
+### Examples
+
+> -   In `dplyr` package we have `select()`, `filter()` and `mutate()` functions. all are verbs
+> -   A function has a verb: **extract_coefficients()**
+> -   Bad named functions `lm()` function
+
+## Three Necessary Functions
+
+before starting writing functions you have to know that a function has three parts:
+
+### Parts of functions
+
+> 1.  Arguments or called formals
+> 2.  Body
+> 3.  environment: or the location of the function's variables
+
+### Checking the parts of functions
+
+> 1.  `body()` function for the body
+> 2.  `formals()` or `args()` for the arguments
+> 3.  `environment()` for the environment
+
+## Checking Some Basic Functions
+
+```{r}
+args(mean)
+formals(mean)
+body(mean)
+```
+
+```{r}
+environment(mean)
+```
+
+## Start Writing Functions
+
+a function without arguments
+
+```{r}
+print_my_name <- function(){
+  print("My name is Dr. Saad")
+}
+```
+
+```{r}
+print_my_name()     
+# you have to use the parentheses for calling
+```
+
+## Calling without parentheses and Body function
+
+```{r}
+print_my_name
+```
+
+```{r}
+body(print_my_name)
+```
+
+## Getting the source code of functions
+
+You can check the source code of R functions easily by calling the function without **parentheses** or use `View()` function
+
+```{r }
+head(cor)
+```
+
+## Functions in R Parlance
+
+```{r}
+my_func <- function(){}
+is.function(my_func)
+class(my_func)
+typeof(my_func)
+```
+pay attention to the type of the function
+## The NULL 
+
+If calling a function returns a `NULL`, it means that this function is empty.  
+
+```{r}
+my_func()
+```
+
+---
+
+## Taking Input from the User
+
+```{r}
+define_me <- function(){
+  Name <- readline(prompt = "What is Your name: ")
+  paste("Hello Mr (Mrs): ", Name)
+}
+```
+
+```{r}
+define_me()
+```
+
+------------------------------------------------------------------------
+
+A more general function
+
+```{r}
+def_me <- function(){
+  name <- readline("Enter your Name: ")
+  age <- readline("Enter your age: ")
+  address <- readline("Your Address: ")
+  field <- readline("What is your field: ")
+  # Displaying Information
+  int_age <- as.integer(age)  # Convert to integer
+  cat("Hello Mr (Mrs):", name,"\n",
+      "I am ",int_age, "years old\n" ,
+       "I am in the", field, "business\n", 
+       "I Live in the wonderful", address)
+}
+```
+
+## More functions without arguments
+
+```{r}
+add_1 <- function(){
+  12 + 10
+}
+add_1()
+```
+```{r}
+print_happy <- function(){
+  print("I am happy that I am learning R")
+}
+```
+```{r}
+print_happy()
+```
+Functions that do not have arguments will always return the same value(s) in its body. It seems that this kind of functions are not useful. We will see a useful case later.
+
+## Passing Arguments to functions
+
+```{r}
+add_num <- function(x, y){
+  return(x + y)
+}
+```
+Note that this function takes two required arguments; in other words, **if you do not give default values to them, they are required arguments** , calling a function without them will throw an error. 
+```{r}
+# add_num() this will throw an error
+```
+```{r}
+add_num(2, 3)
+```
+### Note
+  If a function is one line we could write it without curly braces`{}`
+```{r}
+power_3 <- function(x) x^3
+power_3(2)
+```
+## Arguments with default values (Optional Arguments)
+```{r}
+power <- function(x, y){
+  x**y
+} 
+```
+Wouldn't be a good idea to give the argument `y` a default value. It would and doing so is easy. 
+```{r}
+power <- function(x, y = 2) {
+  x ** y
+}
+```
+
+## Calling the function with the required argument 
+
+```{r}
+power(3)
+#Or you can change the default argument by give it a new value
+power(3, 4)
+```
+
+```{r}
+power(3, 9)
+```
+
+## A more General Template of Functions
+
+```{r}
+my_func <- function(arg1, agr2, arg3 = 'default value'){
+  # Do some calculation
+}
+```
+
+Let us call the required arguments **Data arguments**
+and, the arguments that take default values, **Optional** or **Detail arguments**. 
+
+## Calling functions 
+When calling a function in `R`,specifying the arguments can be in three ways 
+```{r}
+div <- function(first, second){first / second}
+```
+
+  1. Exact names: in this case the order of arguments is not important
+  
+```{r}
+div(second = 12, first = 3)
+```
+
+  2. Argument order: without names, the order is important, passed as they were given in the signature
+```{r}
+div(1, 10)   # 1 means first, 10 is second
+```
+
+**A rule of thumb** use positional arguments with familiar and clear arguments. For unusual argument use full names, even it does require a little more typing, but it will make your code easy to read and understand. 
+
+## The return keyword
+Usually in R, the last computed value is returned implicitly, but we can use the keyword **return** explicitly. for example
+
+```{r}
+power_n <- function(x, y){
+  pow <- x**y
+  return(pow)
+}
+```
+is the same as 
+```{r}
+power_n <- function(x, y){
+  pow <- x**y
+  pow
+}
+```
+
+## Practice with writing functions
+
+Write a function that calculates the Present Value 
+$$PV=FV/(1+r)^n$$ 
+
+```{r}
+pv <- function(fv, r, n) {
+  pv <- fv/(1+r)^n
+  pv
+}
+```
+
+---
+
+Call the function with fv =1000, r = 0.05, n = 5
+
+```{r}
+# call the arguments with their names(order not important)
+pv(fv = 1000, r = 0.05, n = 5) 
+pv(r=0.05, n = 5, fv = 1000)     # I do not recomment this
+# Call the arguments without names (they must in the same order), 
+# called positional argument
+pv(1000, 0.05, 5)
+```
+
+## Exercises: 
+
+give default values to the previous function
+
+1. fv = 2000, r = 0.04, n = 5
+
+2. Give only two arguments default arguments, r = 0.04, n = 5
+
+3. give only one argument default value r = 0.04 or n = 5
+
+## Execrices: Continue
+
+Write a function that converts Fahrenheit to celsius.
+the forumla is like this 
+$$Ctemp = (Ftemp -32) * 5/ 9$$
+Write the reverse function, Celsius to Fahrenheit
+$$Ftemp = (Ctemp + 32) * 9/5$$
+
+Write a function to calculate the circumference of a circle with radius r
+$$circum=2*pi*r$$ $pi=3.14$, r is the radius
+
+---
+
+Define a function to calculate the circle area
+$$area=pi*r^2$$
+
+Pythagorean theorem: Define a function to calculate the hypotenuse
+
+$$a^2 + b^2 = c^2$$
+$$c = \sqrt(a^2 + b^2)$$
+
+a: Side of right triangle
+
+b: Side of right triangle
+
+c: Hypotenuse
+
+## Writing more functions
+
+1. Convert from meter to millimeter, centimeter and decimeter
+2. convert from kilometer to miles (1 mile = 1.609 km)
+3. convert from inches to centimeter (1 inch = 2.54 cm)
+
+## Passing other Data types to functions
+
+R is very powerfull programming language. Thus, we are limited to passing only a single value, we can pass other data types as well. 
+
+Let us write a function that add 155 to its input
+
+```{r}
+add_100 <- function(x) x + 100
+add_100(233)
+```
+let us pass a vector 
+```{r}
+vec <- sample(1:99, 5)
+vec
+add_100(vec)
+```
+---
+
+### Pass a matrix
+
+```{r}
+mat <- matrix(1:8, nrow = 2)
+add_100(mat)
+```
+**Exercise**: 
+pass vectors and matrices to the previously written functions
+
+## More Practice 
+
+Write a function to sample coin flips. 
+The function takes the number of flips, the probability of having Heads
+
+```{r}
+toss_coin <- function(n_flips, p_head) {
+  coin_sides <- c("head", "tail")
+  # Define a vector of weights
+  weights <- c(p_head, 1 - p_head)
+  # Modify the sampling to be weighted
+  sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+}
+```
+
+```{r}
+# Generate 5 coin tosses
+toss_coin(5, 0.80)
+```
+
+--- 
+
+retype the previous function by giving p_head a default value of 0.05
+```{r}
+toss_coin <- function(n_flips, p_head = 0.05) {
+  coin_sides <- c("head", "tail")
+  # Define a vector of weights
+  weights <- c(p_head, 1 - p_head)
+  # Modify the sampling to be weighted
+  sample(coin_sides, n_flips, replace = TRUE, prob = weights)
+}
+```
+
+## Condtionals: if-else statement
+
+The general syntax is 
+```{r}
+if(TRUE){         # if this is true, first part will be the result
+  ## do something
+} else if (TRUE){ # if the first condition failed this will execute
+  ## Do another thing
+} else {   # after all conditions fail
+  ## The last chance
+}
+```
+
+## Example of if-else
+```{r}
+if(runif(1, 0, 25) > 20){
+  print("This number is big")
+} else if(runif(1, 0, 25)  < 10){
+  print("This is less than 10")
+} else {
+  print("I think this my lucky day")
+}
+```
+
+
+## Types of default Arguments
+
+  1. Numeric (An integer of vector)
+  2. Categorical (A vector or character elements)
+  3. Logical (TRUE or FALSE)
+  4. NULL: Very special, which needs to be handled in the body of the function.
+  5. The ellipsis (...)
+Examples:
+```{r}
+args(median)
+```
+
+```{r}
+args(cor)
+```
+
+## The NULL: Case of variables
+
+`NULL` is a special value that represents an empty variables. It is different than zero. and it is `NA` which is a scalar. `NULL` takes no space in memory at all.
+
+```{r}
+length(NA)
+length(NULL)
+```
+```{r}
+is.null(NULL)
+is.null(NA)
+```
+Note: `NULL` can also be used to remove a variable from a dataset
+
+## The NULL: case of function argument
+
+Sometimes some functions can take a `NULL` default. Like
+```{r}
+func <- function(x, y = 2, z = NULL){}
+```
+
+When an argument takes `NULL` default, it means that there is no value is assigned to the argument. Also, it means that there is special handling of the argument that is too complicated to include in the function signature. In other words, the function should behave differently in this case. 
+
+So what should we do to understand the `NULL`: You have to read the documentation. 
+
+## Example of `NULL` 
+
+see the arguments of different functions
+```{r}
+# args(lm)
+# args(set.seed)
+# args(rank)
+# args(cor)
+# args(print.Date)
+# args(prop.test)
+# args(prop.table)
+```
+
+
+`NULL` is useful in many cases, so pay attention to this special **keyword**
+
+--- 
+
+A function example using NULL 
+
+```{r, echo=TRUE, include=TRUE}
+ex <- function (x, max = NULL, ...) 
+{
+  if (is.null(max)) 
+    max <- getOption("max.print", 9999L)
+  if (max < length(x)) {
+    print(format(x[seq_len(max)]), max = max + 1, ...)
+    cat(" [ reached 'max' / getOption(\"max.print\") -- omitted", 
+      length(x) - max, "entries ]\n")
+  }
+  else if (length(x)) 
+    print(format(x), max = max, ...)
+  else cat(class(x)[1L], "of length 0\n")
+  invisible(x)
+}
+```
+
+## A naive example of NULL argument
+
+```{r}
+func <- function(x, y = 2, z = NULL){
+  if (is.null(z)){
+    print("I am z and I have a NULL argument")
+    return(x + y)
+  } else if (is.numeric(z)){
+    print ("I am z and I am not null")
+    return(x + y + z)
+  } else {
+    return(paste(x, y, z, sep = " - "))
+  }
+}
+```
+
+## Logical Argument TRUE or FALSE
+  
+  We can pass a logical default `TRUE` or `FALSE` to control some arguments in the function. Many statistical functions have an argument called **na.rm** for dealing with missing values. For example 
+  
+```{r}
+mean(c(1, 3, 6, 7))
+mean(c(1, 3, 6, 7, NA))
+args(mean.default)
+mean(c(1, 3, 6, 7, NA), na.rm = TRUE)
+```
+
+  
+## The ... argument (ellipsis)
+
+In `R`, or any other programming language, the body of a function contains other functions - which in turns takes arguments-. Wouldn't it be nice if we have a way to pass arguments **between functions**. This is exactly what the **ellipsis or ...** for. It allows us to pass on arguments to inner functions. This is also indicates a variable number of arguments.  
+
+--- 
+
+We will use a very simple example to illustrate how this works in practice. The formula of **geometric mean** is given as 
+
+\begin{align*}
+  GM = & (x_{1}\times x_{2}\times … \times x_{n})^{^{\frac{1}{n}}} \\
+  Log GM = & \frac{1}{n}\log (x_{1}\times x_{2}\times … \times x_{n}) \\
+  Log GM = & \frac{1}{n}(\log x_{1}+\log x_{2}+ … +\log x_{n}) \\
+  GM = & Antilog\frac{\sum \log x_{i}}{n}\\
+\end{align*}
+
+literally mean, we have a vector `X`, then we take the `log()` of each element of the vector, then we compute the **arithmetic mean**, last we exponentiate the results 
+
+--- 
+
+We will write a function in `R` to calculate the Geometric mean as follows:
+
+```{r}
+gm <- function(x){
+  exp(mean(log(x)))
+}
+```
+
+Not very helpful right!!! We try a more clear function 
+
+```{r}
+library(magrittr)
+gm <- function(x){
+  x %>% 
+    log() %>% 
+    mean() %>% 
+    exp()
+}
+```
+
+---
+
+Example 
+
+```{r}
+x <- sample(1:39, 5)
+gm(x)
+```
+
+What if x has a missing value 
+```{r}
+x[3] <- NA
+
+gm(x)          # Result is NA. 
+```
+
+---
+
+How can we solve this problem?
+
+We try to find the problem first 
+
+```{r}
+log(x)   # it has no problem whatsoever 
+mean(x)  # The problem happens here then
+```
+
+Thus, we should be focusing on this function
+
+```{r}
+args(mean)
+args(mean.default)   # it has an argument called na.rm 
+```
+
+---
+
+`na.rm` is a conventional name for removing missing values. we rewrite the function again
+
+```{r}
+gm <- function(x){
+  x %>% 
+    log() %>% 
+    mean(na.rm = TRUE) %>% 
+    exp()
+}
+gm(x)
+```
+
+This is not efficient code, as you have to know about the arguments of 
+the inner functions 
+
+---
+
+We can add an **arg** to remove missing values (na.rm) and set it to false in the signature and we have to **change the body** of the function as well
+
+```{r}
+gm <- function(x, na.rm = FALSE){
+  x %>% 
+    log() %>% 
+    # change the body of this function
+    mean(na.rm = na.rm) %>% 
+    exp()
+}
+gm(x)
+```
+
+---
+
+  * The question, why an argument in the function signature? 
+  * Answer: Simply to deal with the issue before any calculations occur. 
+  *There is still one problem with the code. It is a bit complicated 
+  * Usually, we need a simplified code
+
+Use ... to simplify it 
+The function will be write again
+
+```{r}
+gm <- function(x, ...){
+  x %>% 
+    log() %>% 
+    mean(...) %>% 
+    exp()
+}
+```
+
+This means accept any other argument in gm() function and  pass them to mean() function.
+
+  * One of the main drawbacks of using ... is the user has to read the documentation of the inner functions
+
+## ... as a first function argument 
+
+The ellipsis can be passed as first argument when the number of arguments is not known in advance. For example 
+```{r}
+args(paste)
+args(cat)
+```
+
+## Arguments Coming after the ... Argument
+
+The arguments that come after ... **must be named** explicitly. For example 
+
+```{r}
+args(paste)
+paste(letters[1:4], 1:4, sep = "_", collapse = NULL)
+# paste(letters[1:4], 1:4,  "_")  # this will not work properly
+```
+
+**Final Note** Always use ... when writing your `R` functions, it won't harm.
+
+## Categorical defaults
+
+Another type of arguments a function can take is a character vector, which is called **categorical**. 
+
+When a function has this type of argument in the signature, it will have a line of code in the body contains the function `match.arg()`. The general syntax will be like this
+
+```{r}
+func <- function(cat_arg =c("choice1", "choice2")){
+  cat_arg <- match.arg(cat_arg)
+}
+```
+
+## A Naive Example of Categorical defaults 
+
+```{r}
+func <- function(cat_arg= c("choice1", "choice2", "choice3")){
+  cat_arg <- match.arg(cat_arg)
+  if(cat_arg=="choice1")print("I am the first choice")
+  if(cat_arg=="choice2") print("I am the second choice")
+  if(cat_arg=="choice3") print("I am the last choice")
+}
+func("choice1")
+func("choice2")
+func("choice3")
+```
+
+
