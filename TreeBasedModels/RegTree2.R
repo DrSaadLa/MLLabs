@@ -176,16 +176,61 @@ polls_2008 %>%
   geom_point(aes(day, margin)) + 
   geom_step(aes(day, y_hat), color = "red")
 
+## CrossValidation **cv** Example 01
+#-----------------------------------
+
+cv_model <- train(margin ~ .,
+                  method = "rpart", 
+                  tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)),
+                  data = polls_2008, 
+                  trControl = trainControl(method = "cv", 
+                                           number = 15))
+ggplot(cv_model, highlight = TRUE) + ylab("RMSE(15-fold CV)")
+cv_model$bestTune
+
+## Repeated CrossValidation **repeatedcv**  Example 02 
+#------------------------------------------------------
+rep_cv_model <- train(margin ~ .,
+                      method = "rpart", 
+                      tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)),
+                      data = polls_2008, 
+                      trControl = trainControl(method = "repeatedcv", 
+                                               repeats = 5))
+ggplot(rep_cv_model, highlight = TRUE) + ylab("RMSE(repeatedcv)")
+rep_cv_model$bestTune
+
+# After finding the best tune, we can apply that value regress again
+best_cp <- rep_cv_model$bestTune
+final_model <- rpart(margin ~ . , data = polls_2008, 
+                     control = rpart.control(cp = best_cp))
+plot(final_model, margin = 0.1)
+text(final_model, cex = 0.7)
+
+##****************************************************************
+##                          Best Model                          **
+##****************************************************************
+
+cv_model$finalModel
+rpart.plot(cv_model$finalModel)
+
 ##****************************************************************
 ##                      Pruning the model                       **
 ##****************************************************************
 
-best_cp <- as.numeric(train_rpart$bestTune)
-prune_fit <- prune(fit, cp = best_cp)
+tree_fit <- rpart(margin ~ . , data = polls_2008)
+
+best_cp <- as.numeric(rep_cv_model$bestTune)
+pruned_fit <- prune(tree_fit, cp = best_cp)
 
 summary(prune_fit)
 names(prune_fit)
 
-
 plot(prune_fit, margin = 0.1, compress = TRUE)
 text(prune_fit, mex = 0.75)
+
+
+# Applying a higher cp value 
+
+pruned_tree <- prune(tree_fit, cp = 0.03)
+rpart.plot(pruned_tree)
+
